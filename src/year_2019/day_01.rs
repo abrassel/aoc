@@ -26,13 +26,3 @@ pub fn run() {
     let sol = part_2(&input);
     println!("solution is {}", sol);
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    const INPUT: &str = "";
-
-    #[test]
-    fn test_solution() {}
-}

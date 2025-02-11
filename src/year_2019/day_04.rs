@@ -2,7 +2,7 @@ use itertools::Itertools;
 
 use crate::utls::MyParse;
 
-fn is_password(num: u32) -> bool {
+fn is_password(num: i32) -> bool {
     let str = num.to_string().chars().collect_vec();
 
     let runs = str.iter().chunk_by(|&&k| k);
@@ -23,8 +23,8 @@ fn part_2(input: &'static str) {}
 
 #[allow(unused)]
 struct Range {
-    lower: u32,
-    upper: u32,
+    lower: i32,
+    upper: i32,
 }
 
 impl MyParse for Range {

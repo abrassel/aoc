@@ -2,20 +2,18 @@ use itertools::Itertools;
 
 use crate::utls::MyParse;
 
-type Segment = (((i32, i32), u32), ((i32, i32), u32));
+type Segment = (((i32, i32), i32), ((i32, i32), i32));
 
 // fn part_1(line1: Vec<String>, line2: Vec<String>) -> usize {
 //     let intersection = closest_intersection(intersections(line1, line2));
 //     manhattan_distance(intersection)
 // }
 
-fn manhattan_distance(from: (i32, i32), to: (i32, i32)) -> u32 {
-    ((to.0 - from.0).abs() + (to.1 - from.1).abs())
-        .try_into()
-        .unwrap()
+fn manhattan_distance(from: (i32, i32), to: (i32, i32)) -> i32 {
+    (to.0 - from.0).abs() + (to.1 - from.1).abs()
 }
 
-fn closest_intersection(points: impl Iterator<Item = ((i32, i32), u32)>) -> ((i32, i32), u32) {
+fn closest_intersection(points: impl Iterator<Item = ((i32, i32), i32)>) -> ((i32, i32), i32) {
     points
         .filter(|(point, _)| *point != (0, 0))
         .min_by_key(|(_, dist)| *dist)
@@ -25,13 +23,13 @@ fn closest_intersection(points: impl Iterator<Item = ((i32, i32), u32)>) -> ((i3
 fn intersections(
     line1: Vec<String>,
     line2: Vec<String>,
-) -> impl Iterator<Item = ((i32, i32), u32)> {
+) -> impl Iterator<Item = ((i32, i32), i32)> {
     let line1 = walk(line1);
     let line2 = walk(line2);
     itertools::iproduct!(line1, line2).filter_map(|(lhs, rhs)| intersection(lhs, rhs))
 }
 
-fn intersection(left: Segment, right: Segment) -> Option<((i32, i32), u32)> {
+fn intersection(left: Segment, right: Segment) -> Option<((i32, i32), i32)> {
     let ll = left.0.0;
     let lr = left.1.0;
     let rl = right.0.0;
@@ -92,7 +90,7 @@ fn walk(line: Vec<String>) -> impl Iterator<Item = Segment> + Clone {
         let dst: i32 = num.parse().unwrap();
         let next = (fx + dx * dst, fy + dy * dst);
         cur = next;
-        steps += dst as u32;
+        steps += dst;
         (cur, steps)
     });
     std::iter::once(((0, 0), 0)).chain(points).tuple_windows()
@@ -112,7 +110,7 @@ impl MyParse for Lines {
     }
 }
 
-fn part_2(line1: Vec<String>, line2: Vec<String>) -> u32 {
+fn part_2(line1: Vec<String>, line2: Vec<String>) -> i32 {
     println!(
         "The intersections: {:?}",
         intersections(line1.clone(), line2.clone()).collect_vec()

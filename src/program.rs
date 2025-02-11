@@ -3,10 +3,12 @@ mod opcode;
 use crate::utls::MyParse;
 use opcode::Opcode;
 
+pub type Val = i32;
+
 #[derive(Default, Clone)]
 
 pub struct Program {
-    pub code: Vec<u32>,
+    pub code: Vec<Val>,
 }
 
 impl MyParse for Program {
@@ -23,12 +25,12 @@ impl Program {
         opcode.eval(self)
     }
 
-    pub fn init(&mut self, noun: u32, verb: u32) {
+    pub fn init(&mut self, noun: Val, verb: Val) {
         self.code[1] = noun;
         self.code[2] = verb;
     }
 
-    pub fn eval(&mut self) -> u32 {
+    pub fn eval(&mut self) -> Val {
         let mut step = 0;
         while let Some(next_step) = self.step(step) {
             step = next_step;
