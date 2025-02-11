@@ -14,6 +14,9 @@ where
     <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
     fn my_parse(s: &str) -> Vec<T> {
-        s.lines().map(|line| line.parse().unwrap()).collect()
+        s.lines()
+            .filter(|x| !x.is_empty())
+            .map(|line| line.trim().parse().unwrap())
+            .collect()
     }
 }
