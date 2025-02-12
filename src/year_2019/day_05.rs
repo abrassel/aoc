@@ -1,7 +1,7 @@
 use crate::program::Program;
 
 fn part_1(mut program: Program) -> i32 {
-    program.eval()
+    program.eval(&mut std::io::stdin(), &mut std::io::stdout())
 }
 
 // fn part_2(input: &'static str) {}

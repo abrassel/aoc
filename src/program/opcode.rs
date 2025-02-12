@@ -1,6 +1,7 @@
-use std::io::{self, Write};
-
-use super::Program;
+use super::{
+    Program,
+    io::{ReadVal, WriteVal},
+};
 use crate::program::Val;
 use num_enum::TryFromPrimitive;
 
@@ -49,7 +50,11 @@ pub struct Opcode {
 }
 
 impl Opcode {
-    pub(crate) fn eval(&self, program: &mut Program) -> Option<usize> {
+    pub(crate) fn eval<Io: ReadVal + WriteVal>(
+        &self,
+        program: &mut Program,
+        io: &mut Io,
+    ) -> Option<usize> {
         struct EvalCtx<'a> {
             offset: usize,
             instrs: &'a [InstructionMode],
@@ -99,18 +104,12 @@ impl Opcode {
                 return None;
             }
             OpcodeVariant::Input => {
-                let entered = {
-                    let mut buf = String::new();
-                    print!("Input: ");
-                    std::io::stdout().flush().unwrap();
-                    io::stdin().read_line(&mut buf).unwrap();
-                    buf.trim_end().parse().unwrap()
-                };
+                let entered = io.read_val();
                 *ctx.eval_param(0) = entered;
             }
             OpcodeVariant::Output => {
                 let to_output = ctx.eval_param(0);
-                println!("{}", *to_output);
+                io.write_val(*to_output);
             }
             OpcodeVariant::JumpIfTrue => {
                 if *ctx.eval_param(0) != 0 {

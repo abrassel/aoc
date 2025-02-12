@@ -1,8 +1,10 @@
+use std::io;
+
 use crate::program::Program;
 
 fn part_1(mut program: Program) -> i32 {
     program.init(12, 2);
-    program.eval()
+    program.eval(&mut io::stdin(), &mut io::stdout())
 }
 
 fn part_2(program: Program) -> i32 {
@@ -12,7 +14,7 @@ fn part_2(program: Program) -> i32 {
             println!("Noun: {}, verb: {}", noun, verb);
             let mut program = program.clone();
             program.init(noun, verb);
-            if program.eval() == TARGET {
+            if program.eval(&mut std::io::stdin(), &mut std::io::stdout()) == TARGET {
                 return 100 * noun + verb;
             }
         }
