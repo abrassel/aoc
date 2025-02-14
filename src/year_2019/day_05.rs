@@ -1,6 +1,6 @@
-use crate::program::Program;
+use crate::program::{Program, Val};
 
-fn part_1(mut program: Program) -> i32 {
+fn part_1(mut program: Program) -> Val {
     program.eval(&mut std::io::stdin(), &mut std::io::stdout())
 }
 

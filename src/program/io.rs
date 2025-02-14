@@ -25,25 +25,25 @@ impl ReadVal for std::io::Stdin {
     }
 }
 
-impl ReadVal for i32 {
+impl ReadVal for Val {
     fn read_val(&mut self) -> Val {
         *self
     }
 }
 
-impl WriteVal for i32 {
+impl WriteVal for Val {
     fn write_val(&mut self, val: Val) {
         *self = val;
     }
 }
 
 pub struct View {
-    view: Vec<i32>,
+    view: Vec<Val>,
     offset: usize,
 }
 
 impl View {
-    pub fn new(view: Vec<i32>) -> Self {
+    pub fn new(view: Vec<Val>) -> Self {
         Self { view, offset: 0 }
     }
 }
@@ -65,5 +65,11 @@ impl ReadVal for mpsc::Receiver<Val> {
 impl WriteVal for mpsc::Sender<Val> {
     fn write_val(&mut self, val: Val) {
         self.send(val).unwrap();
+    }
+}
+
+impl WriteVal for Vec<Val> {
+    fn write_val(&mut self, val: Val) {
+        self.push(val);
     }
 }

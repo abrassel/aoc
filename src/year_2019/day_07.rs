@@ -4,7 +4,7 @@ use itertools::Itertools;
 
 use crate::program::{Program, Val, io::View};
 
-fn part_1(program: Program) -> i32 {
+fn part_1(program: Program) -> Val {
     (0..5)
         .permutations(5)
         .map(|input| orchestrate_p1(program.clone(), &input))
@@ -12,7 +12,7 @@ fn part_1(program: Program) -> i32 {
         .unwrap()
 }
 
-fn orchestrate_p1(mut program: Program, input: &[i32]) -> i32 {
+fn orchestrate_p1(mut program: Program, input: &[Val]) -> Val {
     let mut output = 0;
     for &input in input {
         let mut input = View::new(vec![input, output]);
@@ -29,7 +29,7 @@ fn part_2(program: Program) -> Val {
         .unwrap()
 }
 
-fn orchestrate_p2(program: Program, input: &[i32]) -> i32 {
+fn orchestrate_p2(program: Program, input: &[Val]) -> Val {
     // launch 5 programs with pipes attached to their inputs and outputs
 
     let mut handles = vec![];

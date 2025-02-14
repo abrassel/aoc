@@ -1,5 +1,5 @@
 use super::{
-    Program,
+    Program, ProgramState,
     io::{ReadVal, WriteVal},
 };
 use crate::program::Val;
@@ -16,6 +16,7 @@ enum OpcodeVariant {
     JumpIfFalse = 6,
     LessThan = 7,
     Equals = 8,
+    RelativeBaseOffset = 9,
     Halt = 99,
 }
 
@@ -31,6 +32,7 @@ impl OpcodeVariant {
             OpcodeVariant::JumpIfFalse => 2,
             OpcodeVariant::LessThan => 3,
             OpcodeVariant::Equals => 3,
+            OpcodeVariant::RelativeBaseOffset => 1,
         }
     }
 }
@@ -41,11 +43,11 @@ pub enum InstructionMode {
     #[default]
     Parameter = 0,
     Immediate = 1,
+    Relative = 2,
 }
 
 pub struct Opcode {
     variant: OpcodeVariant,
-    offset: usize,
     instrs: Vec<InstructionMode>,
 }
 
@@ -53,26 +55,33 @@ impl Opcode {
     pub(crate) fn eval<Io: ReadVal + WriteVal>(
         &self,
         program: &mut Program,
+        program_state: ProgramState,
         io: &mut Io,
-    ) -> Option<usize> {
+    ) -> Option<ProgramState> {
         struct EvalCtx<'a> {
-            offset: usize,
+            program_state: ProgramState,
             instrs: &'a [InstructionMode],
             program: &'a mut Program,
         }
 
         impl EvalCtx<'_> {
             fn immediate(&mut self, param: usize) -> &mut Val {
-                &mut self.program.code[self.offset + param + 1]
+                &mut self.program.code[self.program_state.offset + param + 1]
             }
 
             fn lookup(&mut self, loc: usize) -> &mut Val {
                 &mut self.program.code[loc]
             }
 
-            fn param(&mut self, param: usize) -> &mut i32 {
+            fn param(&mut self, param: usize) -> &mut Val {
                 let loc = (*self.immediate(param)) as usize;
                 self.lookup(loc)
+            }
+
+            fn relative(&mut self, param: usize) -> &mut Val {
+                let loc = *self.immediate(param)
+                    + i128::try_from(self.program_state.relative_base).unwrap();
+                self.lookup(loc.try_into().unwrap())
             }
 
             /// Evaluate parameter <offset> for the current opcode
@@ -81,12 +90,13 @@ impl Opcode {
                 match mode {
                     InstructionMode::Parameter => self.param(param),
                     InstructionMode::Immediate => self.immediate(param),
+                    InstructionMode::Relative => self.relative(param),
                 }
             }
         }
 
         let mut ctx = EvalCtx {
-            offset: self.offset,
+            program_state,
             instrs: &self.instrs,
             program,
         };
@@ -113,12 +123,20 @@ impl Opcode {
             }
             OpcodeVariant::JumpIfTrue => {
                 if *ctx.eval_param(0) != 0 {
-                    return Some((*ctx.eval_param(1)).try_into().unwrap());
+                    let program_state = ProgramState {
+                        offset: (*ctx.eval_param(1)).try_into().unwrap(),
+                        ..ctx.program_state
+                    };
+                    return Some(program_state);
                 }
             }
             OpcodeVariant::JumpIfFalse => {
                 if *ctx.eval_param(0) == 0 {
-                    return Some((*ctx.eval_param(1)).try_into().unwrap());
+                    let program_state = ProgramState {
+                        offset: (*ctx.eval_param(1)).try_into().unwrap(),
+                        ..ctx.program_state
+                    };
+                    return Some(program_state);
                 }
             }
             OpcodeVariant::LessThan => {
@@ -137,11 +155,20 @@ impl Opcode {
                 };
                 *ctx.eval_param(2) = res;
             }
+            OpcodeVariant::RelativeBaseOffset => {
+                let new_relative_base =
+                    i128::try_from(ctx.program_state.relative_base).unwrap() + *ctx.eval_param(0);
+                ctx.program_state.relative_base = new_relative_base.try_into().unwrap();
+            }
         }
-        Some(self.offset + self.variant.instruction_count() + 1)
+        let program_state = ProgramState {
+            offset: ctx.program_state.offset + self.variant.instruction_count() + 1,
+            ..ctx.program_state
+        };
+        Some(program_state)
     }
 
-    pub fn new(instr_raw: Val, offset: usize) -> Self {
+    pub fn new(instr_raw: Val) -> Self {
         let opcode_raw = instr_raw % 100;
         let instrs = {
             let code = (instr_raw - opcode_raw) / 100;
@@ -152,11 +179,7 @@ impl Opcode {
                 .collect()
         };
 
-        let variant = OpcodeVariant::try_from(opcode_raw % 100).unwrap();
-        Self {
-            variant,
-            offset,
-            instrs,
-        }
+        let variant = OpcodeVariant::try_from((opcode_raw % 100) as i32).unwrap();
+        Self { variant, instrs }
     }
 }

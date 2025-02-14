@@ -7,7 +7,8 @@ use crate::program::io::WriteVal;
 use crate::utls::MyParse;
 use opcode::Opcode;
 
-pub type Val = i32;
+pub type Val = i128;
+const CODE_PAD: usize = 10;
 
 #[derive(Default, Clone)]
 
@@ -15,18 +16,27 @@ pub struct Program {
     pub code: Vec<Val>,
 }
 
+#[derive(Default)]
+pub struct ProgramState {
+    offset: usize,
+    relative_base: usize,
+}
+
 impl MyParse for Program {
     fn my_parse(s: &str) -> Self {
-        let code = s.trim().split(",").map(|x| x.parse().unwrap()).collect();
-        Self { code }
+        Program::new(Self::parse_code(s))
     }
 }
 
 impl Program {
-    pub fn step<Io: ReadVal + WriteVal>(&mut self, loc: usize, io: &mut Io) -> Option<usize> {
-        let opcode_raw = self.code[loc];
-        let opcode = Opcode::new(opcode_raw, loc);
-        opcode.eval(self, io)
+    pub fn step<Io: ReadVal + WriteVal>(
+        &mut self,
+        program_state: ProgramState,
+        io: &mut Io,
+    ) -> Option<ProgramState> {
+        let opcode_raw = self.code[program_state.offset];
+        let opcode = Opcode::new(opcode_raw);
+        opcode.eval(self, program_state, io)
     }
 
     pub fn init(&mut self, noun: Val, verb: Val) {
@@ -35,9 +45,9 @@ impl Program {
     }
 
     pub fn eval_joint<Io: ReadVal + WriteVal>(&mut self, io: &mut Io) -> Val {
-        let mut step = 0;
-        while let Some(next_step) = self.step(step, io) {
-            step = next_step;
+        let mut program_state = ProgramState::default();
+        while let Some(next_program_state) = self.step(program_state, io) {
+            program_state = next_program_state;
         }
         self.code[0]
     }
@@ -63,5 +73,14 @@ impl Program {
         let mut joint = JointValMut { input, output };
 
         self.eval_joint(&mut joint)
+    }
+
+    fn new(mut code: Vec<Val>) -> Self {
+        code.resize(code.len() * CODE_PAD, 0);
+        Self { code }
+    }
+
+    pub(crate) fn parse_code(s: &str) -> Vec<Val> {
+        s.trim().split(",").map(|x| x.parse().unwrap()).collect()
     }
 }
