@@ -1,5 +1,8 @@
 use std::str::FromStr;
 
+pub mod color;
+pub mod linalg;
+
 pub fn read_text_from_file<T: MyParse>(year: &str, day: &str) -> T {
     let str = std::fs::read_to_string(format!("inputs/{}-{}.txt", year, day)).unwrap();
     T::my_parse(&str)

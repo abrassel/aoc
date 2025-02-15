@@ -1,19 +1,9 @@
 use itertools::Itertools;
-use num_enum::TryFromPrimitive;
 
-use crate::utls::MyParse;
+use crate::utls::{MyParse, color::Color};
 
 const WIDTH: usize = 25;
 const HEIGHT: usize = 6;
-
-#[derive(TryFromPrimitive)]
-#[repr(u8)]
-#[derive(PartialEq)]
-pub enum Color {
-    Black = 0,
-    White = 1,
-    Transparent = 2,
-}
 
 fn part_1(layers: &[u8], width: usize, height: usize) -> usize {
     let layers = layers.chunks(width * height);

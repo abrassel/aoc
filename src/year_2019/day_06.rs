@@ -67,24 +67,24 @@ impl Dag {
         "COM"
     }
 
-    pub fn count_orbits(&self) -> usize {
-        let mut frontier = vec![self.root()];
-        let mut total_orbits = 0;
-        let mut level = 0;
-        while !frontier.is_empty() {
-            let mut new_frontier = vec![];
-            for cur in frontier {
-                total_orbits += level;
-                for nbor in self.neighbors(cur) {
-                    new_frontier.push(nbor.as_str());
-                }
-            }
-            frontier = new_frontier;
-            level += 1;
-        }
+    // pub fn count_orbits(&self) -> usize {
+    //     let mut frontier = vec![self.root()];
+    //     let mut total_orbits = 0;
+    //     let mut level = 0;
+    //     while !frontier.is_empty() {
+    //         let mut new_frontier = vec![];
+    //         for cur in frontier {
+    //             total_orbits += level;
+    //             for nbor in self.neighbors(cur) {
+    //                 new_frontier.push(nbor.as_str());
+    //             }
+    //         }
+    //         frontier = new_frontier;
+    //         level += 1;
+    //     }
 
-        total_orbits
-    }
+    //     total_orbits
+    // }
 
     pub fn paths_from_root(&self) -> Path {
         let mut frontier = vec![(None, self.root())];

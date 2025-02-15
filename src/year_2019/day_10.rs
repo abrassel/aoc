@@ -1,7 +1,6 @@
 use std::{
     collections::{HashMap, HashSet},
     fmt::Display,
-    io::Write,
 };
 
 use fraction::GenericFraction;
@@ -9,10 +8,11 @@ use itertools::Itertools;
 
 use crate::maze::{Cell, Maze};
 
+#[allow(unused)]
 fn part_1(maze: &Maze) -> usize {
     let points = get_points(maze);
     let lines = lines(&points);
-    print_points_on_lines(&lines);
+    // print_points_on_lines(&lines);
     let counts = counts(&lines);
     *counts.values().max().unwrap()
 }
@@ -31,10 +31,10 @@ fn part_2(maze: &Maze, nth: usize) -> Point {
         .sorted_unstable_by_key(|((slope, _), _)| *slope)
         .rev();
 
-    let copy: Vec<(Line, _)> = inorder_lines
-        .clone()
-        .map(|(line, points)| (line.into(), points))
-        .collect_vec();
+    // let copy: Vec<(Line, _)> = inorder_lines
+    //     .clone()
+    //     .map(|(line, points)| (line.into(), points))
+    //     .collect_vec();
     // partition each line by points left and right (or above and below for vertical) of laser location
     let inorder_lines_with_y_axis_sep = inorder_lines
         .map(|(_, points)| points)
@@ -121,15 +121,15 @@ impl std::fmt::Debug for Line {
     }
 }
 
-fn print_points_on_lines(points_on_lines: &PointsOnLines) {
-    for (slope, points) in points_on_lines {
-        (
-            "Line {:?} contains these points: {:?}",
-            Line::from(*slope),
-            points,
-        );
-    }
-}
+// fn print_points_on_lines(points_on_lines: &PointsOnLines) {
+//     for (slope, points) in points_on_lines {
+//         println!(
+//             "Line {:?} contains these points: {:?}",
+//             Line::from(*slope),
+//             points,
+//         );
+//     }
+// }
 
 fn lines(points: &[Point]) -> PointsOnLines {
     let mut lines: PointsOnLines = HashMap::new();

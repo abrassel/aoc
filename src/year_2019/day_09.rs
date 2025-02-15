@@ -1,5 +1,6 @@
 use crate::program::Program;
 
+#[allow(unused)]
 fn part_1(mut program: Program) {
     program.eval(&mut std::io::stdin(), &mut std::io::stdout());
 }

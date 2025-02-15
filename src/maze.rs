@@ -1,4 +1,4 @@
-use std::{collections::HashSet, convert::Infallible, ops::Index};
+use std::convert::Infallible;
 
 use crate::utls::MyParse;
 

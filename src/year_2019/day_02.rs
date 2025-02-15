@@ -2,6 +2,7 @@ use std::io;
 
 use crate::program::{Program, Val};
 
+#[allow(unused)]
 fn part_1(mut program: Program) -> Val {
     program.init(12, 2);
     program.eval(&mut io::stdin(), &mut io::stdout())

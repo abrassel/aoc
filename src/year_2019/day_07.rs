@@ -4,6 +4,7 @@ use itertools::Itertools;
 
 use crate::program::{Program, Val, io::View};
 
+#[allow(unused)]
 fn part_1(program: Program) -> Val {
     (0..5)
         .permutations(5)
@@ -79,7 +80,7 @@ fn orchestrate_p2(program: Program, input: &[Val]) -> Val {
 
 pub fn run() {
     let input: Program = crate::utls::read_text_from_file("2019", "07");
-    let res = part_1(input.clone());
+    // let res = part_1(input.clone());
     let res = part_2(input);
     println!("The answer is: {}", res);
     // part_2(input);

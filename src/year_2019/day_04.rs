@@ -19,6 +19,7 @@ fn part_1(range: Range) -> usize {
         .count()
 }
 
+#[allow(unused)]
 fn part_2(input: &'static str) {}
 
 #[allow(unused)]
@@ -42,12 +43,4 @@ pub fn run() {
     let res = part_1(input);
     println!("The answer is {}", res);
     // part_2(input);
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    //     #[test]
-    //     fn test_solution() {}
 }

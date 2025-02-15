@@ -1,5 +1,6 @@
 pub mod io;
 mod opcode;
+pub mod spawn;
 
 use crate::program::io::ReadVal;
 use crate::program::io::WriteVal;
