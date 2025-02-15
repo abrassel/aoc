@@ -5,5 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.95"
+fraction = "0.15.3"
 itertools = "0.14.0"
+num = "0.4.3"
 num_enum = "0.7.3"

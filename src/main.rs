@@ -1,3 +1,4 @@
+pub mod maze;
 mod program;
 mod utls;
 mod year_2019;
