@@ -2,6 +2,8 @@ use std::ops::{Index, IndexMut};
 
 use num_enum::TryFromPrimitive;
 
+use crate::program::Val;
+
 #[derive(
     Hash,
     Default,
@@ -15,7 +17,7 @@ use num_enum::TryFromPrimitive;
     derive_more::From,
     derive_more::AddAssign,
 )]
-pub struct Point(pub i32, pub i32);
+pub struct Point(pub Val, pub Val);
 
 impl Point {
     pub const UP: Point = Point(0, 1);
@@ -36,7 +38,7 @@ pub enum RotateDir {
 }
 
 impl RotateDir {
-    pub fn transform(&self) -> [[i32; 2]; 2] {
+    pub fn transform(&self) -> [[Val; 2]; 2] {
         match self {
             RotateDir::Clockwise => [[0, 1], [-1, 0]],
             RotateDir::CounterClockwise => [[0, -1], [1, 0]],

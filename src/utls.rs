@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 pub mod color;
+pub mod display;
 pub mod linalg;
 
 pub fn read_text_from_file<T: MyParse>(year: &str, day: &str) -> T {
