@@ -1,3 +1,5 @@
+#![feature(hash_set_entry)]
+
 pub mod maze;
 mod program;
 mod utls;
