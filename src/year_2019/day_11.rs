@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    program::{Program, io::WriteVal, spawn},
+    program::{Program, io::TryWriteVal, spawn},
     utls::{
         color::Color,
         display::paint,
@@ -19,7 +19,7 @@ fn paint_robot(program: Program, start_color: Color) -> HashMap<Point, Color> {
     let mut dir = Point::UP;
     let mut pos = Point::default();
     let mut program = spawn::spawn(program);
-    program.write_val(start_color as i128);
+    program.try_write_val(start_color as i128);
     while let Some(paint_color) = program.try_read_val() {
         points.insert(pos, u8::try_from(paint_color).unwrap().try_into().unwrap());
         let turn_dir = {
@@ -30,7 +30,7 @@ fn paint_robot(program: Program, start_color: Color) -> HashMap<Point, Color> {
         pos += dir;
 
         let new_pos_color = points.get(&pos).copied().unwrap_or_default();
-        program.write_val(new_pos_color as i128);
+        program.try_write_val(new_pos_color as i128);
     }
     program.join();
     points

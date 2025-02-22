@@ -1,4 +1,5 @@
 #![feature(hash_set_entry)]
+#![feature(iter_intersperse)]
 
 pub mod maze;
 mod program;

@@ -5,7 +5,7 @@ use std::{
 
 use super::{
     Program, Val,
-    io::{ReadVal, WriteVal},
+    io::{TryReadVal, TryWriteVal},
 };
 
 pub struct ProgramHandle {
@@ -15,7 +15,7 @@ pub struct ProgramHandle {
 }
 
 impl ProgramHandle {
-    pub fn join(self) -> impl ReadVal {
+    pub fn join(self) -> impl TryReadVal {
         self.program_handle.join().unwrap()
     }
 
@@ -24,9 +24,9 @@ impl ProgramHandle {
     }
 }
 
-impl WriteVal for ProgramHandle {
-    fn write_val(&mut self, val: Val) {
-        self.writer.send(val).unwrap()
+impl TryWriteVal for ProgramHandle {
+    fn try_write_val(&mut self, val: Val) -> Option<()> {
+        self.writer.send(val).ok()
     }
 }
 

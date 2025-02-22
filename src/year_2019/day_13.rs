@@ -6,7 +6,7 @@ use num_enum::TryFromPrimitive;
 use crate::{
     program::{
         Program, Val,
-        io::{ReadVal, WriteVal},
+        io::{TryReadVal, TryWriteVal},
     },
     utls::{display::paint, linalg::Point},
 };
@@ -27,7 +27,7 @@ pub enum ArcadeTile {
     Ball = 4,
 }
 fn part_1(mut program: Program) -> usize {
-    let mut output_buf = vec![];
+    let mut output_buf: Vec<i128> = vec![];
 
     program.eval(&mut std::io::stdin(), &mut output_buf);
 
@@ -62,8 +62,8 @@ impl ArcadeProgram {
     }
 }
 
-impl ReadVal for ArcadeProgram {
-    fn read_val(&mut self) -> crate::program::Val {
+impl TryReadVal for ArcadeProgram {
+    fn try_read_val(&mut self) -> Option<Val> {
         // move paddle toward ball
         let ball_pos = self
             .game_state
@@ -79,12 +79,12 @@ impl ReadVal for ArcadeProgram {
             .0;
 
         // only need to consider x dimension
-        (ball_pos.0 - paddle_pos.0).signum() as Val
+        Some((ball_pos.0 - paddle_pos.0).signum() as Val)
     }
 }
 
-impl WriteVal for ArcadeProgram {
-    fn write_val(&mut self, val: crate::program::Val) {
+impl TryWriteVal for ArcadeProgram {
+    fn try_write_val(&mut self, val: crate::program::Val) -> Option<()> {
         self.new_tile_buf.push(val);
 
         if self.new_tile_buf.len() == 3 {
@@ -104,6 +104,7 @@ impl WriteVal for ArcadeProgram {
             }
             self.new_tile_buf.clear();
         }
+        Some(())
     }
 }
 

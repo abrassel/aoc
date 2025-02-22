@@ -1,75 +1,111 @@
+pub mod ascii_grid;
+pub mod infallible;
+
+use itertools::Itertools;
+
 use super::Val;
 use std::{io::Write, sync::mpsc};
 
-pub trait WriteVal {
-    fn write_val(&mut self, val: Val);
-}
+pub struct AsciiStdin;
 
-pub trait ReadVal {
-    fn read_val(&mut self) -> Val;
-}
-
-impl WriteVal for std::io::Stdout {
-    fn write_val(&mut self, val: Val) {
-        writeln!(self, "{}", val).unwrap();
+impl TryReadVal for AsciiStdin {
+    fn try_read_val(&mut self) -> Option<Val> {
+        {
+            let mut buf = String::new();
+            print!("Input: ");
+            std::io::stdout().flush().unwrap();
+            std::io::stdin().read_line(&mut buf).unwrap();
+            let chars = buf.trim().chars().collect_vec();
+            assert!(chars.len() == 1);
+            let u8ified = chars[0] as u8;
+            Some(u8ified.into())
+        }
     }
 }
 
-impl ReadVal for std::io::Stdin {
-    fn read_val(&mut self) -> Val {
+pub trait TryWriteVal {
+    fn try_write_val(&mut self, val: Val) -> Option<()>;
+}
+
+pub(crate) trait TryReadVal {
+    fn try_read_val(&mut self) -> Option<Val>;
+}
+
+impl TryWriteVal for std::io::Stdout {
+    fn try_write_val(&mut self, val: Val) -> std::option::Option<()> {
+        writeln!(self, "{}", val).ok()
+    }
+}
+
+impl TryReadVal for std::io::Stdin {
+    fn try_read_val(&mut self) -> Option<Val> {
         let mut buf = String::new();
         print!("Input: ");
         std::io::stdout().flush().unwrap();
         self.read_line(&mut buf).unwrap();
-        buf.trim().parse().unwrap()
+        Some(buf.trim().parse().unwrap())
     }
 }
 
-impl ReadVal for Val {
-    fn read_val(&mut self) -> Val {
-        *self
+impl TryReadVal for Val {
+    fn try_read_val(&mut self) -> Option<Val> {
+        Some(*self)
     }
 }
 
-impl WriteVal for Val {
-    fn write_val(&mut self, val: Val) {
+impl TryWriteVal for Val {
+    fn try_write_val(&mut self, val: Val) -> Option<()> {
         *self = val;
+        Some(())
     }
 }
 
 pub struct View {
-    view: Vec<Val>,
-    offset: usize,
+    pub(crate) view: Vec<Val>,
+    pub(crate) offset: usize,
 }
 
 impl View {
-    pub fn new(view: Vec<Val>) -> Self {
-        Self { view, offset: 0 }
+    pub fn new<T: TryInto<Val>>(view: Vec<T>) -> Self
+    where
+        <T as std::convert::TryInto<i128>>::Error: std::fmt::Debug,
+    {
+        Self {
+            view: view.into_iter().map(|x| x.try_into().unwrap()).collect(),
+            offset: 0,
+        }
+    }
+
+    pub fn new_char(view: Vec<char>) -> Self {
+        let u8s = view.into_iter().map(|x| x as u8).collect_vec();
+        Self::new(u8s)
     }
 }
 
-impl ReadVal for View {
-    fn read_val(&mut self) -> Val {
+impl TryReadVal for View {
+    fn try_read_val(&mut self) -> Option<Val> {
         let val = self.view[self.offset];
         self.offset += 1;
-        val
+        Some(val)
     }
 }
 
-impl ReadVal for mpsc::Receiver<Val> {
-    fn read_val(&mut self) -> Val {
-        self.recv().unwrap()
+impl TryReadVal for mpsc::Receiver<Val> {
+    fn try_read_val(&mut self) -> Option<Val> {
+        self.recv().ok()
     }
 }
 
-impl WriteVal for mpsc::Sender<Val> {
-    fn write_val(&mut self, val: Val) {
+impl TryWriteVal for mpsc::Sender<Val> {
+    fn try_write_val(&mut self, val: Val) -> Option<()> {
         self.send(val).unwrap();
+        Some(())
     }
 }
 
-impl WriteVal for Vec<Val> {
-    fn write_val(&mut self, val: Val) {
+impl TryWriteVal for Vec<Val> {
+    fn try_write_val(&mut self, val: Val) -> Option<()> {
         self.push(val);
+        Some(())
     }
 }

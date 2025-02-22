@@ -4,9 +4,9 @@ use num_enum::TryFromPrimitive;
 #[repr(u8)]
 pub enum Color {
     #[default]
-    #[display("⬛")]
-    Black = 0,
     #[display("⬜")]
+    Black = 0,
+    #[display("⬛")]
     White = 1,
     #[display("☒")]
     Transparent = 2,

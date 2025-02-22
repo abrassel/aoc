@@ -1,6 +1,6 @@
 use super::{
     Program, ProgramState,
-    io::{ReadVal, WriteVal},
+    io::{TryReadVal, TryWriteVal},
 };
 use crate::program::Val;
 use num_enum::TryFromPrimitive;
@@ -52,7 +52,7 @@ pub struct Opcode {
 }
 
 impl Opcode {
-    pub(crate) fn eval<Io: ReadVal + WriteVal>(
+    pub(crate) fn eval<Io: TryReadVal + TryWriteVal>(
         &self,
         program: &mut Program,
         program_state: ProgramState,
@@ -114,12 +114,12 @@ impl Opcode {
                 return None;
             }
             OpcodeVariant::Input => {
-                let entered = io.read_val();
-                *ctx.eval_param(0) = entered;
+                let entered = io.try_read_val();
+                *ctx.eval_param(0) = entered?;
             }
             OpcodeVariant::Output => {
                 let to_output = ctx.eval_param(0);
-                io.write_val(*to_output);
+                io.try_write_val(*to_output)?;
             }
             OpcodeVariant::JumpIfTrue => {
                 if *ctx.eval_param(0) != 0 {

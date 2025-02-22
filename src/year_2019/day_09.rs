@@ -17,7 +17,7 @@ pub fn run() {
 
 #[cfg(test)]
 mod test {
-    use crate::utls::MyParse;
+    use crate::{program::Val, utls::MyParse};
 
     use super::*;
 
@@ -35,7 +35,7 @@ mod test {
     fn test_solution_2() {
         let input = "1102,34915192,34915192,7,4,7,99,0";
         let mut program = Program::my_parse(input);
-        let mut buf = vec![];
+        let mut buf: Vec<Val> = vec![];
         program.eval(&mut std::io::stdin(), &mut buf);
         assert!(buf.len() == 1);
         assert!(buf[0].to_string().len() == 16);
@@ -46,7 +46,7 @@ mod test {
     fn test_solution_3() {
         let input = "104,1125899906842624,99";
         let mut program = Program::my_parse(input);
-        let mut buf = vec![];
+        let mut buf: Vec<Val> = vec![];
         program.eval(&mut std::io::stdin(), &mut buf);
         assert!(buf.len() == 1);
         assert_eq!(buf[0], 1125899906842624);

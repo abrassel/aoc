@@ -12,9 +12,13 @@ mod day_11;
 mod day_12;
 mod day_13;
 mod day_14;
+mod day_15;
+mod day_16;
+mod day_17;
+mod day_18;
 
 pub fn run() {
-    run_day(14);
+    run_day(18);
 }
 
 fn run_day(day: i32) {
@@ -33,6 +37,10 @@ fn run_day(day: i32) {
         12 => day_12::run(),
         13 => day_13::run(),
         14 => day_14::run(),
+        15 => day_15::run(),
+        16 => day_16::run(),
+        17 => day_17::run(),
+        18 => day_18::run(),
         _ => unreachable!("day not implemented"),
     }
 }

@@ -2,8 +2,8 @@ pub mod io;
 mod opcode;
 pub mod spawn;
 
-use crate::program::io::ReadVal;
-use crate::program::io::WriteVal;
+use crate::program::io::TryReadVal;
+use crate::program::io::TryWriteVal;
 
 use crate::utls::MyParse;
 use opcode::Opcode;
@@ -30,7 +30,7 @@ impl MyParse for Program {
 }
 
 impl Program {
-    pub fn step<Io: ReadVal + WriteVal>(
+    pub fn step<Io: TryReadVal + TryWriteVal>(
         &mut self,
         program_state: ProgramState,
         io: &mut Io,
@@ -45,7 +45,7 @@ impl Program {
         self.code[2] = verb;
     }
 
-    pub fn eval_joint<Io: ReadVal + WriteVal>(&mut self, io: &mut Io) -> Val {
+    pub fn eval_joint<Io: TryReadVal + TryWriteVal>(&mut self, io: &mut Io) -> Val {
         let mut program_state = ProgramState::default();
         while let Some(next_program_state) = self.step(program_state, io) {
             program_state = next_program_state;
@@ -53,21 +53,21 @@ impl Program {
         self.code[0]
     }
 
-    pub fn eval<W: WriteVal, R: ReadVal>(&mut self, input: &mut R, output: &mut W) -> Val {
+    pub fn eval<W: TryWriteVal, R: TryReadVal>(&mut self, input: &mut R, output: &mut W) -> Val {
         struct JointValMut<'a, W, R> {
             input: &'a mut R,
             output: &'a mut W,
         }
 
-        impl<W, R: ReadVal> ReadVal for JointValMut<'_, W, R> {
-            fn read_val(&mut self) -> Val {
-                self.input.read_val()
+        impl<W, R: TryReadVal> TryReadVal for JointValMut<'_, W, R> {
+            fn try_read_val(&mut self) -> Option<Val> {
+                self.input.try_read_val()
             }
         }
 
-        impl<W: WriteVal, R> WriteVal for JointValMut<'_, W, R> {
-            fn write_val(&mut self, val: Val) {
-                self.output.write_val(val)
+        impl<W: TryWriteVal, R> TryWriteVal for JointValMut<'_, W, R> {
+            fn try_write_val(&mut self, val: Val) -> Option<()> {
+                self.output.try_write_val(val)
             }
         }
 
