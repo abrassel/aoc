@@ -1,8 +1,5 @@
 use matrix::Matrix;
-use std::{
-    char::ParseCharError,
-    ops::{Index, IndexMut},
-};
+use std::ops::{Index, IndexMut};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 

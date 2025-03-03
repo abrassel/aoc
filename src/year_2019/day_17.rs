@@ -6,7 +6,7 @@ use strum::IntoEnumIterator;
 use crate::{
     program::{
         Program, Val,
-        io::{AsciiStdin, TryReadVal, TryWriteVal, View, infallible::Unused},
+        io::{TryReadVal, TryWriteVal, View, infallible::Unused},
     },
     utls::{
         conversions::point_map,
@@ -260,14 +260,4 @@ pub fn run() {
     let ans = part_1(input.clone());
     println!("The ans is {}", ans);
     part_2(input);
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    const INPUT: &str = "";
-
-    #[test]
-    fn test_solution() {}
 }

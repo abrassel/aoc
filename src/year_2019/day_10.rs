@@ -6,11 +6,11 @@ use std::{
 use fraction::GenericFraction;
 use itertools::Itertools;
 
-use crate::maze::{Cell, Maze};
+use crate::maze::Maze;
 
 #[allow(unused)]
 fn part_1(maze: &Maze) -> usize {
-    let points = get_points(maze);
+    let points = maze.points.iter().map(|&x| x.into()).collect_vec();
     let lines = lines(&points);
     // print_points_on_lines(&lines);
     let counts = counts(&lines);
@@ -18,7 +18,8 @@ fn part_1(maze: &Maze) -> usize {
 }
 
 fn part_2(maze: &Maze, nth: usize) -> Point {
-    let lines = lines(&get_points(maze));
+    let points = maze.points.iter().map(|&x| x.into()).collect_vec();
+    let lines = lines(&points);
     // only take lines which contain the best point
     let counts = counts(&lines);
     let best_point = counts.into_iter().max_by_key(|x| x.1).unwrap().0;
@@ -70,19 +71,6 @@ fn part_2(maze: &Maze, nth: usize) -> Point {
     panic!("Was not 200 points");
 }
 
-fn get_points(maze: &Maze) -> Vec<Point> {
-    maze.grid
-        .iter()
-        .enumerate()
-        .flat_map(|(ridx, row)| {
-            row.iter()
-                .enumerate()
-                .filter(|(_, cell)| **cell == Cell::Wall)
-                .map(move |(cidx, _)| (cidx.try_into().unwrap(), ridx.try_into().unwrap()).into())
-        })
-        .collect()
-}
-
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, Ord, PartialOrd, derive_more::Display)]
 enum Slope {
     #[display("{}/{}", _0.numer().unwrap(), _0.denom().unwrap())]
@@ -109,6 +97,12 @@ impl From<Point> for (i32, i32) {
 impl From<(i32, i32)> for Point {
     fn from(value: (i32, i32)) -> Self {
         Self(value.0, -value.1)
+    }
+}
+
+impl From<crate::utls::linalg::Point> for Point {
+    fn from(value: crate::utls::linalg::Point) -> Self {
+        Self(value.0 as i32, value.1 as i32)
     }
 }
 
