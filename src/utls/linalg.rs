@@ -38,6 +38,12 @@ impl Point {
     }
 }
 
+impl From<Point> for Vec<Val> {
+    fn from(val: Point) -> Self {
+        vec![val.0, val.1]
+    }
+}
+
 impl std::fmt::Debug for Point {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         <Self as std::fmt::Display>::fmt(self, f)
